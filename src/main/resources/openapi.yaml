@@ -1,0 +1,132 @@
+---
+openapi: 3.1.0
+info:
+  title: Open Api Demo Service
+  description: |2
+  
+  
+        # Overview 
+
+        Open Api Demo Service to implement the customizations
+  version: "0.1"
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Get Health
+      description: A 200 response indicates a successful health check
+      operationId: get_health_health_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Healthy"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /books:
+    get:
+      tags:
+        - Books
+      summary: Get localized list of books
+      description: Returns a list of books localized based on the Accept-Language header.
+      operationId: get_books
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Language preference for the response. Defaults to English (en).
+          required: false
+          schema:
+            type: string
+            example: en
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BooksResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          nullable: true
+          title: Detail
+      required:
+        - detail
+      title: ErrorResponse
+    Healthy:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - UP
+          title: Status
+          default: UP
+      title: Healthy
+    BooksResponse:
+      type: object
+      properties:
+        books:
+          type: setOfLocalizedBooks
+          items:
+            $ref: '#/components/schemas/Book'
+      required:
+        - books
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+      required:
+        - id
+        - title
+      x-implements: [ 'org.example.openapi.demo.Localizable' ]
